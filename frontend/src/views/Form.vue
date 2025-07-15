@@ -63,70 +63,79 @@ function submitForm() {
 <template>
   <main class="form-container">
     <h2>Candidate Application</h2>
-     <!-- Step 1 -->
+
+    <!-- Step 1 -->
     <div v-if="step === 1" class="step">
-      <div class="column">
-        <div class="form-field">
-          <label for="firstName">First Name*</label>
-          <InputText id="firstName" v-model="form.firstName" required />
+      <div class="form-grid">
+        <!-- Left Column -->
+        <div class="column">
+          <div class="form-field">
+            <label for="firstName">First Name*</label>
+            <InputText id="firstName" v-model="form.firstName" required />
+          </div>
+
+          <div class="form-field">
+            <label for="email">Email Address*</label>
+            <InputText id="email" v-model="form.email" type="email" required />
+          </div>
+
+          <div class="form-field">
+            <label for="dob">Date of Birth*</label>
+            <DatePicker id="dob" v-model="form.dob" dateFormat="yy-mm-dd" required />
+          </div>
+
+          <div class="form-field">
+            <label for="position">Position Applied For*</label>
+            <Select
+              id="position"
+              v-model="form.position"
+              :options="positions"
+              placeholder="Select a position"
+              required
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="resume">Resume / CV Upload*</label>
+            <FileUpload
+              id="resume"
+              name="resume"
+              mode="basic"
+              accept=".pdf,.doc,.docx"
+              :auto="true"
+              @upload="handleUpload"
+              required
+            />
+            <div v-if="form.resume" class="resume-name">Selected: {{ form.resume.name }}</div>
+          </div>
         </div>
 
-        <div class="form-field">
-          <label for="lastName">Last Name*</label>
-          <InputText id="lastName" v-model="form.lastName" required />
-        </div>
+        <!-- Right Column -->
+        <div class="column">
+          <div class="form-field">
+            <label for="lastName">Last Name*</label>
+            <InputText id="lastName" v-model="form.lastName" required />
+          </div>
 
-        <div class="form-field">
-          <label for="email">Email Address*</label>
-          <InputText id="email" v-model="form.email" type="email" required />
-        </div>
+          <div class="form-field">
+            <label for="phone">Phone Number*</label>
+            <InputMask id="phone" v-model="form.phone" mask="+999 999999999" required />
+          </div>
 
-        <div class="form-field">
-          <label for="phone">Phone Number*</label>
-          <InputMask id="phone" v-model="form.phone" mask="+999 999999999" required />
-        </div>
+          <div class="form-field">
+            <label for="address">Current Address</label>
+            <Textarea id="address" v-model="form.address" rows="4" cols="20" />
+          </div>
 
-        <div class="form-field">
-          <label for="dob">Date of Birth*</label>
-          <DatePicker id="dob" v-model="form.dob" dateFormat="yy-mm-dd" required />
+          <div class="form-field">
+            <label for="linkedin">LinkedIn Profile</label>
+            <InputText id="linkedin" v-model="form.linkedin" type="url" />
+          </div>
         </div>
+      </div>
 
-        <div class="form-field">
-          <label for="address">Current Address</label>
-          <Textarea id="address" v-model="form.address" rows="4" />
-        </div>
-
-        <div class="form-field">
-          <label for="position">Position Applied For*</label>
-          <Select
-            id="position"
-            v-model="form.position"
-            :options="positions"
-            placeholder="Select a position"
-            required
-          />
-        </div>
-
-        <div class="form-field">
-          <label for="linkedin">LinkedIn Profile</label>
-          <InputText id="linkedin" v-model="form.linkedin" type="url" />
-        </div>
-
-        <div class="form-field">
-          <label for="resume">Resume / CV Upload*</label>
-          <FileUpload
-            id="resume"
-            name="resume"
-            mode="basic"
-            accept=".pdf,.doc,.docx"
-            :auto="true"
-            @upload="handleUpload"
-            required
-          />
-        </div>
-        <div class="buttons-1">
-          <Button @click="goToStep(2)">Next</Button>
-        </div>
+      <div class="buttons-1">
+        <Button @click="goToStep(2)">Next</Button>
       </div>
     </div>
 
@@ -141,9 +150,10 @@ function submitForm() {
   </main>
 </template>
 
+
 <style scoped>
 .form-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -153,36 +163,48 @@ h2 {
 }
 
 .step {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   margin-top: 2em;
 }
 
-label {
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.form-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+label {
   font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
-input {
-  padding: 0.5rem;
-  font-size: 1rem;
-}
-
-button {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  font-weight: bold;
+.resume-name {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+  font-style: italic;
 }
 
 .buttons {
   display: flex;
   justify-content: space-between;
+  margin-top: 2rem;
 }
 
 .buttons-1 {
   display: flex;
   justify-content: flex-end;
+  margin-top: 2rem;
 }
 </style>
