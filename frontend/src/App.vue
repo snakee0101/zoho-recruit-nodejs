@@ -68,8 +68,7 @@ nav a:hover {
 .main-content {
   flex: 1;
   padding: 3rem;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  width: 100%;
+  display: block;
 }
 </style>
