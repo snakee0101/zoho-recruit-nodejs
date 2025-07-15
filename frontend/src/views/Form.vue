@@ -406,6 +406,10 @@ label {
   min-height: 2.5rem;
 }
 
+.form-field .p-select, .form-field .p-datepicker {
+  width: 100%;
+}
+
 .resume-name {
   grid-column: 2; /* выравниваем под полем, а не под label */
   margin-top: 0.25rem;
