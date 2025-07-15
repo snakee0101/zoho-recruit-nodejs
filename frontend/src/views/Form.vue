@@ -154,16 +154,7 @@ function submitForm() {
 <style scoped>
 .form-container {
   max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-h2 {
-  text-align: center;
-}
-
-.step {
-  margin-top: 2em;
+  margin: auto;
 }
 
 .form-grid {
@@ -172,27 +163,40 @@ h2 {
   gap: 2rem;
 }
 
-.form-field {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+h2 {
+  text-align: center;
+    margin-bottom: 2rem;
 }
 
 .column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
+}
+
+/* Каждое поле — две колонки: label и input */
+.form-field {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 1rem;
 }
 
 label {
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  white-space: nowrap;
+}
+
+.form-field :is(input, textarea, .p-inputtext, .p-dropdown, .p-calendar, .p-inputmask, .p-fileupload) {
+  width: 100%;
+  min-height: 2.5rem;
 }
 
 .resume-name {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: #333;
+  grid-column: 2; /* выравниваем под полем, а не под label */
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #444;
   font-style: italic;
 }
 
