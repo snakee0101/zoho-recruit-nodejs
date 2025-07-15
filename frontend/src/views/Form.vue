@@ -29,10 +29,10 @@ const positions = [
 ]
 
 function goToStep(n) {
-  if (n === 2 && !validateStep1()) {
+  /*if (n === 2 && !validateStep1()) {
     alert('Please fill in all required fields.')
     return
-  }
+  }*/
   step.value = n
 }
 
@@ -124,6 +124,9 @@ function submitForm() {
             required
           />
         </div>
+        <div class="buttons-1">
+          <Button @click="goToStep(2)">Next</Button>
+        </div>
       </div>
     </div>
 
@@ -131,8 +134,8 @@ function submitForm() {
     <div v-else-if="step === 2" class="step">
       step 2
       <div class="buttons">
-        <button @click="prevStep">Previous</button>
-        <button @click="submitForm">Submit</button>
+        <Button @click="goToStep(1)">Previous</Button>
+        <Button @click="submitForm">Submit</Button>
       </div>
     </div>
   </main>
@@ -153,6 +156,7 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 2em;
 }
 
 label {
@@ -175,5 +179,10 @@ button {
 .buttons {
   display: flex;
   justify-content: space-between;
+}
+
+.buttons-1 {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
