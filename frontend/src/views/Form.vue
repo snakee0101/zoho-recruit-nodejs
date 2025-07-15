@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 import InputMask from 'primevue/inputmask'
 import Textarea from 'primevue/textarea'
@@ -8,7 +8,7 @@ import Select from 'primevue/select'
 import FileUpload from 'primevue/fileupload'
 
 const step = ref(1)
-const form = ref({
+const form = reactive({
   firstName: '',
   lastName: '',
   email: '',
@@ -37,7 +37,7 @@ function goToStep(n) {
 }
 
 function validateStep1() {
-  const f = form.value
+  const f = form
   return (
     f.firstName &&
     f.lastName &&
@@ -50,11 +50,11 @@ function validateStep1() {
 }
 
 function handleUpload(event) {
-  form.value.resume = event.files?.[0]
+  form.resume = event.files?.[0]
 }
 
 function submitForm() {
-  console.log('Submitted:', form.value)
+  console.log('Submitted:', form)
   alert('Candidate submitted successfully!')
   // You can reset the form or navigate elsewhere here
 }
