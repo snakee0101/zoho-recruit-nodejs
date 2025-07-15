@@ -1,14 +1,18 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 
 import InputMask from 'primevue/inputmask'
 import Textarea from 'primevue/textarea'
 import DatePicker from 'primevue/datepicker'
 import Select from 'primevue/select'
 import FileUpload from 'primevue/fileupload'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
+import MultiSelect from 'primevue/multiselect'
 
 const step = ref(1)
 const form = reactive({
+  // Step 1 fields
   firstName: '',
   lastName: '',
   email: '',
@@ -18,6 +22,19 @@ const form = reactive({
   position: null,
   resume: null,
   linkedin: '',
+
+  // Step 2 fields
+  educationLevel: null,
+  yearsExperience: null,
+  skills: [],
+  previousEmployer: '',
+  currentJobTitle: '',
+  noticePeriod: null,
+  expectedSalary: null,
+  availabilityInterview: null,
+  preferredLocation: null,
+  coverLetter: '',
+  sourceApplication: null,
 })
 
 const positions = [
@@ -28,25 +45,72 @@ const positions = [
   'UX Designer',
 ]
 
-function goToStep(n) {
-  /*if (n === 2 && !validateStep1()) {
-    alert('Please fill in all required fields.')
-    return
-  }*/
-  step.value = n
+const educationLevels = [
+  'High School',
+  "Associate's Degree",
+  "Bachelor's Degree",
+  "Master's Degree",
+  'Doctorate',
+]
+
+const noticePeriods = [
+  'Immediate',
+  '1 Week',
+  '2 Weeks',
+  '1 Month',
+  'More than 1 Month',
+]
+
+const preferredLocations = [
+  'New York',
+  'San Francisco',
+  'Chicago',
+  'Austin',
+  'Remote',
+]
+
+const sources = [
+  'Company Website',
+  'LinkedIn',
+  'Job Board',
+  'Referral',
+  'Other',
+]
+
+const skillsOptionsMap = {
+  'Software Engineer': [
+    'JavaScript',
+    'Python',
+    'SQL',
+    'Java',
+    'C#',
+    'React',
+    'Node.js',
+    'AWS',
+    'Docker',
+    'Kubernetes',
+  ],
+  'Data Analyst': [
+    'SQL',
+    'Python',
+    'R',
+    'Excel',
+    'Tableau',
+    'PowerBI',
+    'SAS',
+    'MATLAB',
+  ],
+  'Project Manager': ['Agile', 'Scrum', 'Project Planning', 'Risk Management', 'Budgeting'],
+  'QA Engineer': ['Test Automation', 'Selenium', 'JIRA', 'TestRail', 'Performance Testing'],
+  'UX Designer': ['Sketch', 'Figma', 'Adobe XD', 'User Research', 'Prototyping', 'Wireframing'],
 }
 
-function validateStep1() {
-  const f = form
-  return (
-    f.firstName &&
-    f.lastName &&
-    f.email &&
-    f.phone &&
-    f.dob &&
-    f.position &&
-    f.resume
-  )
+const skillsOptions = computed(() => {
+  return skillsOptionsMap[form.position]
+})
+
+function goToStep(n) {
+  step.value = n
 }
 
 function handleUpload(event) {
@@ -56,7 +120,6 @@ function handleUpload(event) {
 function submitForm() {
   console.log('Submitted:', form)
   alert('Candidate submitted successfully!')
-  // You can reset the form or navigate elsewhere here
 }
 </script>
 
@@ -141,7 +204,117 @@ function submitForm() {
 
     <!-- Step 2 -->
     <div v-else-if="step === 2" class="step">
-      step 2
+      <div class="form-grid">
+        <!-- Left Column -->
+        <div class="column">
+          <div class="form-field">
+            <label for="educationLevel">Education Level*</label>
+            <Select
+              id="educationLevel"
+              v-model="form.educationLevel"
+              :options="educationLevels"
+              placeholder="Select education level"
+              required
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="yearsExperience">Years of Experience</label>
+            <InputText
+              id="yearsExperience"
+              v-model.number="form.yearsExperience"
+              type="number"
+              min="0"
+              placeholder="e.g. 3"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="skills">Skills</label>
+            <MultiSelect
+              id="skills"
+              v-model="form.skills"
+              :options="skillsOptions"
+              placeholder="Select relevant skills"
+              :filter="true"
+              :showClear="true"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="previousEmployer">Previous Employer</label>
+            <InputText id="previousEmployer" v-model="form.previousEmployer" />
+          </div>
+
+          <div class="form-field">
+            <label for="currentJobTitle">Current Job Title</label>
+            <InputText id="currentJobTitle" v-model="form.currentJobTitle" />
+          </div>
+
+          <div class="form-field">
+            <label for="noticePeriod">Notice Period</label>
+            <Select
+              id="noticePeriod"
+              v-model="form.noticePeriod"
+              :options="noticePeriods"
+              placeholder="Select notice period"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="expectedSalary">Expected Salary</label>
+            <InputText
+              id="expectedSalary"
+              v-model.number="form.expectedSalary"
+              type="number"
+              min="0"
+              placeholder="Enter expected salary"
+            />
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="column">
+          <div class="form-field">
+            <label for="availabilityInterview">Availability for Interview</label>
+            <DatePicker
+              id="availabilityInterview"
+              v-model="form.availabilityInterview"
+              showTime
+              hourFormat="24"
+              placeholder="Select date & time"
+              dateFormat="yy-mm-dd"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="preferredLocation">Preferred Location</label>
+            <Select
+              id="preferredLocation"
+              v-model="form.preferredLocation"
+              :options="preferredLocations"
+              placeholder="Select preferred location"
+            />
+          </div>
+
+          <div class="form-field" style="align-items: flex-start;">
+            <label for="coverLetter">Cover Letter</label>
+            <Textarea id="coverLetter" v-model="form.coverLetter" rows="6" cols="20" />
+          </div>
+
+          <div class="form-field">
+            <label for="sourceApplication">Source of Application*</label>
+            <Select
+              id="sourceApplication"
+              v-model="form.sourceApplication"
+              :options="sources"
+              placeholder="Select source"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
       <div class="buttons">
         <Button @click="goToStep(1)">Previous</Button>
         <Button @click="submitForm">Submit</Button>
@@ -149,7 +322,6 @@ function submitForm() {
     </div>
   </main>
 </template>
-
 
 <style scoped>
 .form-container {
