@@ -1,25 +1,62 @@
 <script setup>
 import { ref } from 'vue'
 
+import InputMask from 'primevue/inputmask'
+import Textarea from 'primevue/textarea'
+import DatePicker from 'primevue/datepicker'
+import Select from 'primevue/select'
+import FileUpload from 'primevue/fileupload'
+
 const step = ref(1)
 const form = ref({
   firstName: '',
+  lastName: '',
   email: '',
-  age: '',
-  country: ''
+  phone: '',
+  address: '',
+  dob: null,
+  position: null,
+  resume: null,
+  linkedin: '',
 })
 
-const nextStep = () => {
-  step.value = 2
+const positions = [
+  'Software Engineer',
+  'Data Analyst',
+  'Project Manager',
+  'QA Engineer',
+  'UX Designer',
+]
+
+function goToStep(n) {
+  if (n === 2 && !validateStep1()) {
+    alert('Please fill in all required fields.')
+    return
+  }
+  step.value = n
 }
 
-const prevStep = () => {
-  step.value = 1
+function validateStep1() {
+  const f = form.value
+  return (
+    f.firstName &&
+    f.lastName &&
+    f.email &&
+    f.phone &&
+    f.dob &&
+    f.position &&
+    f.resume
+  )
 }
 
-const submitForm = () => {
-  console.log('Form submitted:', form.value)
-  alert('Form submitted! See console.')
+function handleUpload(event) {
+  form.value.resume = event.files?.[0]
+}
+
+function submitForm() {
+  console.log('Submitted:', form.value)
+  alert('Candidate submitted successfully!')
+  // You can reset the form or navigate elsewhere here
 }
 </script>
 
@@ -28,27 +65,71 @@ const submitForm = () => {
     <h2>Candidate Application</h2>
      <!-- Step 1 -->
     <div v-if="step === 1" class="step">
-      <label>
-        First Name:
-        <input v-model="form.firstName" type="text" />
-      </label>
-      <label>
-        Email:
-        <input v-model="form.email" type="email" />
-      </label>
-      <button @click="nextStep">Next</button>
+      <div class="column">
+        <div class="form-field">
+          <label for="firstName">First Name*</label>
+          <InputText id="firstName" v-model="form.firstName" required />
+        </div>
+
+        <div class="form-field">
+          <label for="lastName">Last Name*</label>
+          <InputText id="lastName" v-model="form.lastName" required />
+        </div>
+
+        <div class="form-field">
+          <label for="email">Email Address*</label>
+          <InputText id="email" v-model="form.email" type="email" required />
+        </div>
+
+        <div class="form-field">
+          <label for="phone">Phone Number*</label>
+          <InputMask id="phone" v-model="form.phone" mask="+999 999999999" required />
+        </div>
+
+        <div class="form-field">
+          <label for="dob">Date of Birth*</label>
+          <DatePicker id="dob" v-model="form.dob" dateFormat="yy-mm-dd" required />
+        </div>
+
+        <div class="form-field">
+          <label for="address">Current Address</label>
+          <Textarea id="address" v-model="form.address" rows="4" />
+        </div>
+
+        <div class="form-field">
+          <label for="position">Position Applied For*</label>
+          <Select
+            id="position"
+            v-model="form.position"
+            :options="positions"
+            placeholder="Select a position"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="linkedin">LinkedIn Profile</label>
+          <InputText id="linkedin" v-model="form.linkedin" type="url" />
+        </div>
+
+        <div class="form-field">
+          <label for="resume">Resume / CV Upload*</label>
+          <FileUpload
+            id="resume"
+            name="resume"
+            mode="basic"
+            accept=".pdf,.doc,.docx"
+            :auto="true"
+            @upload="handleUpload"
+            required
+          />
+        </div>
+      </div>
     </div>
 
     <!-- Step 2 -->
     <div v-else-if="step === 2" class="step">
-      <label>
-        Age:
-        <input v-model="form.age" type="number" />
-      </label>
-      <label>
-        Country:
-        <input v-model="form.country" type="text" />
-      </label>
+      step 2
       <div class="buttons">
         <button @click="prevStep">Previous</button>
         <button @click="submitForm">Submit</button>
