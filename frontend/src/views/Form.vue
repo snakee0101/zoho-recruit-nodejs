@@ -20,7 +20,7 @@ const form = reactive({
   address: '',
   dob: null,
   position: null,
-  resume: null,
+  resume: [],
   linkedin: '',
 
   // Step 2 fields
@@ -109,12 +109,16 @@ const skillsOptions = computed(() => {
   return skillsOptionsMap[form.position]
 })
 
+const getFileNames = computed(() => {
+  return form.resume.map(file => file.name).join(', ')
+})
+
 function goToStep(n) {
   step.value = n
 }
 
-function handleUpload(event) {
-  form.resume = event.files?.[0]
+function selectFiles(event) {
+  form.resume = event.files
 }
 
 function submitForm() {
@@ -162,14 +166,14 @@ function submitForm() {
             <label for="resume">Resume / CV Upload*</label>
             <FileUpload
               id="resume"
-              name="resume"
+              name="resume[]"
+              :multiple="true"
               mode="basic"
               accept=".pdf,.doc,.docx"
-              :auto="true"
-              @upload="handleUpload"
+              @select="selectFiles"
               required
             />
-            <div v-if="form.resume" class="resume-name">Selected: {{ form.resume.name }}</div>
+            <div v-if="form.resume" class="resume-name">Selected: {{ getFileNames }}</div>
           </div>
         </div>
 
