@@ -138,42 +138,59 @@ function submitForm() {
         <div class="column">
           <div class="form-field">
             <label for="firstName">First Name*</label>
-            <InputText id="firstName" v-model="form.firstName" required />
+            <div>
+              <InputText id="firstName" v-model="form.firstName" required />
+              <p class="error-text">first name error</p>
+            </div>
           </div>
 
           <div class="form-field">
             <label for="email">Email Address*</label>
-            <InputText id="email" v-model="form.email" type="email" required />
+            <div>
+              <InputText id="email" v-model="form.email" type="email" required />
+              <p class="error-text">email error</p>
+            </div>
           </div>
 
           <div class="form-field">
             <label for="dob">Date of Birth*</label>
-            <DatePicker id="dob" v-model="form.dob" dateFormat="yy-mm-dd" required />
+            <div>
+              <DatePicker id="dob" v-model="form.dob" dateFormat="yy-mm-dd" required />
+              <p class="error-text">date of birth error</p>
+            </div>
           </div>
 
           <div class="form-field">
             <label for="position">Position Applied For*</label>
-            <Select
-              id="position"
-              v-model="form.position"
-              :options="positions"
-              placeholder="Select a position"
-              required
-            />
+            <div>
+              <Select
+                id="position"
+                v-model="form.position"
+                :options="positions"
+                placeholder="Select a position"
+                required
+              />
+              <p class="error-text">position error</p>
+            </div>
+
           </div>
 
           <div class="form-field">
             <label for="resume">Resume / CV Upload*</label>
-            <FileUpload
-              id="resume"
-              name="resume[]"
-              :multiple="true"
-              mode="basic"
-              accept=".pdf,.doc,.docx"
-              @select="selectFiles"
-              required
-            />
-            <div v-if="form.resume" class="resume-name">Selected: {{ getFileNames }}</div>
+            <div>
+              <FileUpload
+                id="resume"
+                name="resume[]"
+                :multiple="true"
+                mode="basic"
+                accept=".pdf,.doc,.docx"
+                @select="selectFiles"
+                required
+              />
+              <div v-if="form.resume" class="resume-name">Selected: {{ getFileNames }}</div>
+              <p class="error-text">resume error</p>
+            </div>
+
           </div>
         </div>
 
@@ -181,12 +198,18 @@ function submitForm() {
         <div class="column">
           <div class="form-field">
             <label for="lastName">Last Name*</label>
-            <InputText id="lastName" v-model="form.lastName" required />
+            <div>
+              <InputText id="lastName" v-model="form.lastName" required />
+              <p class="error-text">last name error</p>
+            </div>
           </div>
 
           <div class="form-field">
             <label for="phone">Phone Number*</label>
-            <InputMask id="phone" v-model="form.phone" mask="+999 999999999" required />
+            <div>
+              <InputMask id="phone" v-model="form.phone" mask="+999 999999999" required />
+              <p class="error-text">phone error</p>
+            </div>
           </div>
 
           <div class="form-field">
@@ -196,7 +219,10 @@ function submitForm() {
 
           <div class="form-field">
             <label for="linkedin">LinkedIn Profile</label>
-            <InputText id="linkedin" v-model="form.linkedin" type="url" />
+            <div>
+              <InputText id="linkedin" v-model="form.linkedin" type="url" />
+              <p class="error-text">linkedin profile error</p>
+            </div>
           </div>
         </div>
       </div>
@@ -213,13 +239,16 @@ function submitForm() {
         <div class="column">
           <div class="form-field">
             <label for="educationLevel">Education Level*</label>
-            <Select
-              id="educationLevel"
-              v-model="form.educationLevel"
-              :options="educationLevels"
-              placeholder="Select education level"
-              required
-            />
+            <div>
+              <Select
+                id="educationLevel"
+                v-model="form.educationLevel"
+                :options="educationLevels"
+                placeholder="Select education level"
+                required
+              />
+              <p class="error-text">education level error</p>
+            </div>
           </div>
 
           <div class="form-field">
@@ -308,13 +337,16 @@ function submitForm() {
 
           <div class="form-field">
             <label for="sourceApplication">Source of Application*</label>
-            <Select
-              id="sourceApplication"
-              v-model="form.sourceApplication"
-              :options="sources"
-              placeholder="Select source"
-              required
-            />
+            <div>
+              <Select
+                id="sourceApplication"
+                v-model="form.sourceApplication"
+                :options="sources"
+                placeholder="Select source"
+                required
+              />
+              <p class="error-text">source of application error</p>
+            </div>
           </div>
         </div>
       </div>
@@ -328,6 +360,12 @@ function submitForm() {
 </template>
 
 <style scoped>
+.error-text {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
 .form-container {
   max-width: 1000px;
   margin: auto;
