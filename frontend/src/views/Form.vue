@@ -18,9 +18,9 @@ const form = reactive({
   email: '',
   phone: '',
   address: '',
-  dob: null,
+  dob: null, //date
   position: null,
-  resume: [],
+  resume: [], //isn't included in database structure
   linkedin: '',
 
   // Step 2 fields
@@ -29,9 +29,9 @@ const form = reactive({
   skills: [],
   previousEmployer: '',
   currentJobTitle: '',
-  noticePeriod: null,
+  noticePeriod: null, //string
   expectedSalary: null,
-  availabilityInterview: null,
+  availabilityInterview: null, //date-time
   preferredLocation: null,
   coverLetter: '',
   sourceApplication: null,

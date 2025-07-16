@@ -1,0 +1,60 @@
+CREATE TABLE form_submissions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER, -- Can be NULL, no foreign key constraint for now
+
+    -- Step 1 fields
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    address TEXT,
+    dob DATE NOT NULL,
+    position VARCHAR(100) NOT NULL,
+    linkedin TEXT,
+
+    -- Step 2 fields
+    education_level VARCHAR(100) NOT NULL,
+    years_experience INTEGER,
+    skills TEXT[], -- Array of skills
+    previous_employer VARCHAR(150),
+    current_job_title VARCHAR(150),
+    notice_period VARCHAR(50),
+    expected_salary INTEGER,
+    availability_interview TIMESTAMP,
+    preferred_location VARCHAR(100),
+    cover_letter TEXT,
+    source_application VARCHAR(100) NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+--sample data for form submissions
+
+INSERT INTO form_submissions (
+    user_id, first_name, last_name, email, phone, address, dob, position, linkedin,
+    education_level, years_experience, skills, previous_employer, current_job_title,
+    notice_period, expected_salary, availability_interview, preferred_location,
+    cover_letter, source_application
+) VALUES
+(
+    1, 'Alice', 'Johnson', 'alice@example.com', '+123 456789012', '123 Main St, New York, NY',
+    '1990-04-15', 'Software Engineer', 'https://linkedin.com/in/alicejohnson',
+    'Bachelor''s Degree', 5, ARRAY['JavaScript', 'React', 'Node.js'], 'Tech Corp', 'Frontend Dev',
+    '2 Weeks', 85000, '2025-07-20 14:00:00', 'Remote',
+    'I am passionate about front-end development and user experience.', 'LinkedIn'
+),
+(
+    2, 'Bob', 'Smith', 'bob.smith@example.com', '+987 654321098', NULL,
+    '1988-09-02', 'Data Analyst', NULL,
+    'Master''s Degree', 3, ARRAY['Python', 'SQL', 'Tableau'], 'Data Inc.', 'Junior Analyst',
+    'Immediate', 65000, '2025-07-22 09:30:00', 'Chicago',
+    'Looking forward to contributing my data analysis skills.', 'Job Board'
+),
+(
+    3, 'Carol', 'Nguyen', 'carol.nguyen@example.com', '+111 222333444', '456 Elm St, Austin, TX',
+    '1995-01-27', 'Project Manager', 'https://linkedin.com/in/carolpm',
+    'Bachelor''s Degree', 7, ARRAY['Agile', 'Scrum', 'Budgeting'], 'PM Solutions', 'Project Lead',
+    '1 Month', 95000, NULL, 'Austin',
+    'Experienced in managing cross-functional teams and delivering on time.', 'Referral'
+);
