@@ -21,8 +21,15 @@ try {
 }
 
 const FormSubmission = require('./models/form_submission')(sequelize)
+const User = require('./models/user')(sequelize)
   
 //routes
+app.get('/test', (req, res) => {
+  User.findAll().then((users) => {
+    res.json(users);
+  });
+});
+
 app.get('/api/form_submissions', (req, res) => {
   FormSubmission.findAll().then((submissions) => {
     res.json(submissions);

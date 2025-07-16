@@ -58,3 +58,17 @@ INSERT INTO form_submissions (
     '1 Month', 95000, NULL, 'Austin',
     'Experienced in managing cross-functional teams and delivering on time.', 'Referral'
 );
+
+
+
+//таблица users
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password TEXT NOT NULL
+);
+
+INSERT INTO users (email, password) VALUES ('alice@example.com', '$2b$10$cdHRFoXlaPDZIXPI4R/0g.NfLyWngyFPqRHiSoA0yK15xTshMXQaS'), ('bob@example.com', '$2b$10$z6sP10GePDCJHTI4.HQgF.qPkpEo0aUENlaUFBsJqPN0anCDEapFq');
+//пароль "password1" ($2b$10$cdHRFoXlaPDZIXPI4R/0g.NfLyWngyFPqRHiSoA0yK15xTshMXQaS), "password2" ($2b$10$z6sP10GePDCJHTI4.HQgF.qPkpEo0aUENlaUFBsJqPN0anCDEapFq)
+//bcrypt-параметры (для nodejs-библиотеки): bcrypt.genSalt(10);
