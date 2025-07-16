@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors')
 const { Sequelize, QueryTypes } = require('sequelize');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3001;
@@ -35,6 +36,23 @@ app.get('/api/form_submissions', (req, res) => {
     res.json(submissions);
   });
 });
+
+app.post('/api/login', (req, res) => { 
+  //найти пользователя по email
+  User.findOne({
+    where: {
+      email: req.body.email
+    }
+  }).then((user) => {
+    if (bcrypt.compareSync(req.body.password, user.password)) { //сравнить текстовый пароль пользователя (req.body.password) с его bcrypt-хешем (user.password) из базы
+      res.json(user); //если все правильно - сохранить вход пользователя (сгенерировать token и сохранить его в cookie и в базу)
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' }); //иначе - ошибка
+    }
+  }).catch((error) => {
+    res.status(500).json({ error: 'Cannot find user' });
+  });
+}); 
 
 app.post('/api/form_submissions', (req, res) => {
   try {

@@ -34,7 +34,8 @@ async function submitLogin() {
     loginSuccess.value = true
     setTimeout(() => loginSuccess.value = false, 2000)
   } catch (err) {
-    loginErrors.invalid_credentials = 'Invalid credentials.'
+    loginErrors.invalid_credentials = err.response.data.error
+    setTimeout(() => loginErrors.invalid_credentials = '', 2000)
   }
 }
 </script>
@@ -65,7 +66,7 @@ async function submitLogin() {
       </div>
     </div>
 
-    <p class="error-text" v-if="loginErrors.invalid_credentials">{{ loginErrors.password }}</p>
+    <p class="error-text" v-if="loginErrors.invalid_credentials">{{ loginErrors.invalid_credentials }}</p>
 
     <div v-if="loginSuccess" class="success-message">
       Logged in successfully!
