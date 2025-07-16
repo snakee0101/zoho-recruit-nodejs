@@ -3,6 +3,8 @@ const cors = require('cors')
 const { Sequelize, QueryTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 
+const jwt = require('jsonwebtoken');
+ 
 const app = express();
 const port = 3001;
 
@@ -45,7 +47,19 @@ app.post('/api/login', (req, res) => {
     }
   }).then((user) => {
     if (bcrypt.compareSync(req.body.password, user.password)) { //сравнить текстовый пароль пользователя (req.body.password) с его bcrypt-хешем (user.password) из базы
-      res.json(user); //если все правильно - сохранить вход пользователя (сгенерировать token и сохранить его в cookie и в базу)
+      //если все правильно - сохранить вход пользователя - сгенерировать token,...
+      let token = jwt.sign({ id: user.email }, 'test JWT secret', { expiresIn: '7d' });
+      
+      //сохранить token в базу
+      User.update({
+        token: token
+      }, {
+        where: {
+          email: req.body.email
+        }
+      }).then(() => {
+        //сохранить token в cookie
+      });      
     } else {
       res.status(401).json({ error: 'Invalid credentials' }); //иначе - ошибка
     }

@@ -66,7 +66,8 @@ INSERT INTO form_submissions (
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(150) NOT NULL UNIQUE,
-  password TEXT NOT NULL
+  password TEXT NOT NULL,
+  token VARCHAR(255) NULL
 );
 
 INSERT INTO users (email, password) VALUES ('alice@example.com', '$2b$10$hXqAAL.zj8AaiRyWNQWue.u9DfrsIXLM9jidCoCeYv82RhTgJVTLS'), ('bob@example.com', '$2b$10$A/jqnye6hybLZZDb7qwxruICsuqZDdX0plU/UatTWXCc5JR8PSh3y');
