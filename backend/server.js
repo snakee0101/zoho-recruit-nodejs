@@ -17,14 +17,10 @@ app.get('/api/form_submissions', (req, res) => {
   try {
     sequelize.authenticate(); 
 
-    const submissionsPromise = sequelize.query('SELECT * FROM form_submissions', {
-      type: QueryTypes.SELECT,
-      raw: true,
-      logging: console.log,
-    }); //returns PROMISE
-
-    submissionsPromise.then((submissions) => {
-      res.send(submissions);
+    const FormSubmission = require('./models/form_submission')(sequelize)
+    
+    FormSubmission.findAll().then((submissions) => {
+        res.json(submissions);
     });
   } catch (error) {
     console.error('Unable to connect to the database:', error);
