@@ -111,7 +111,7 @@ function formatDate(datetime) {
 
           <div class="form-field">
             <label>Expected Salary:</label>
-            <div>${{ submission.expected_salary }}</div>
+            <div>{{ submission.expected_salary ? '$' + submission.expected_salary : 'N/A' }}</div>
           </div>
         </div>
 

@@ -130,6 +130,9 @@ function validateStep1() {
   return requiredFields.every(f => f !== null && f !== '') && hasResume
 }
 
+function validateStep2() {
+  return form.educationLevel !== null && form.sourceApplication !== null
+}
 
 function goToStep1() {
   step.value = 1;
@@ -170,6 +173,11 @@ function resetForm() {
 }
 
 function submitForm() {
+  if (!validateStep2()) {
+    alert('Please fill in all required fields in stage 2 before submitting the form.')
+    return
+  }
+
   axios.post('http://localhost:3001/api/form_submissions', form)
       .then(response => {
           showSuccess.value = true
