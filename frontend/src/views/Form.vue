@@ -12,6 +12,17 @@ import Button from 'primevue/button'
 import MultiSelect from 'primevue/multiselect'
 
 const showSuccess = ref(false)
+const errors = reactive({
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  dob: '',
+  position: '',
+  resume: '',
+  educationLevel: '',
+  sourceApplication: ''
+})
 
 const step = ref(1)
 const form = reactive({
@@ -117,21 +128,33 @@ const getFileNames = computed(() => {
 })
 
 function validateStep1() {
-  const requiredFields = [
-    form.firstName,
-    form.lastName,
-    form.email,
-    form.phone,
-    form.dob,
-    form.position,
-  ]
-  const hasResume = form.resume.length > 0
+  errors.first_name = form.firstName.trim() ? '' : 'First name is required.'
+  errors.last_name = form.lastName.trim() ? '' : 'Last name is required.'
+  errors.email = form.email.trim() ? '' : 'Email address is required.'
+  errors.phone = form.phone.trim() ? '' : 'Phone number is required.'
+  errors.dob = form.dob ? '' : 'Date of birth is required.'
+  errors.position = form.position ? '' : 'Position must be selected.'
+  errors.resume = form.resume.length > 0 ? '' : 'Resume is required.'
 
-  return requiredFields.every(f => f !== null && f !== '') && hasResume
+  return (
+    !errors.first_name &&
+    !errors.last_name &&
+    !errors.email &&
+    !errors.phone &&
+    !errors.dob &&
+    !errors.position &&
+    !errors.resume
+  )
 }
 
 function validateStep2() {
-  return form.educationLevel !== null && form.sourceApplication !== null
+  errors.educationLevel = form.educationLevel ? '' : 'Education level is required.'
+  errors.sourceApplication = form.sourceApplication ? '' : 'Source of application is required.'
+
+  return (
+    !errors.sourceApplication &&
+    !errors.educationLevel
+  )
 }
 
 function goToStep1() {
@@ -201,7 +224,7 @@ function submitForm() {
             <label for="firstName">First Name*</label>
             <div>
               <InputText id="firstName" v-model="form.firstName" required />
-              <p class="error-text">first name error</p>
+              <p class="error-text" v-if="errors.first_name">{{ errors.first_name }}</p>
             </div>
           </div>
 
@@ -209,7 +232,7 @@ function submitForm() {
             <label for="email">Email Address*</label>
             <div>
               <InputText id="email" v-model="form.email" type="email" required />
-              <p class="error-text">email error</p>
+              <p class="error-text" v-if="errors.email">{{ errors.email }}</p>
             </div>
           </div>
 
@@ -217,7 +240,7 @@ function submitForm() {
             <label for="dob">Date of Birth*</label>
             <div>
               <DatePicker id="dob" v-model="form.dob" dateFormat="yy-mm-dd" required />
-              <p class="error-text">date of birth error</p>
+              <p class="error-text" v-if="errors.dob">{{ errors.dob }}</p>
             </div>
           </div>
 
@@ -231,9 +254,8 @@ function submitForm() {
                 placeholder="Select a position"
                 required
               />
-              <p class="error-text">position error</p>
+              <p class="error-text" v-if="errors.position">{{ errors.position }}</p>
             </div>
-
           </div>
 
           <div class="form-field">
@@ -249,9 +271,8 @@ function submitForm() {
                 required
               />
               <div v-if="form.resume" class="resume-name">Selected: {{ getFileNames }}</div>
-              <p class="error-text">resume error</p>
+              <p class="error-text" v-if="errors.resume">{{ errors.resume }}</p>
             </div>
-
           </div>
         </div>
 
@@ -261,7 +282,7 @@ function submitForm() {
             <label for="lastName">Last Name*</label>
             <div>
               <InputText id="lastName" v-model="form.lastName" required />
-              <p class="error-text">last name error</p>
+              <p class="error-text" v-if="errors.last_name">{{ errors.last_name }}</p>
             </div>
           </div>
 
@@ -269,7 +290,7 @@ function submitForm() {
             <label for="phone">Phone Number*</label>
             <div>
               <InputMask id="phone" v-model="form.phone" mask="+999 999999999" required />
-              <p class="error-text">phone error</p>
+              <p class="error-text" v-if="errors.phone">{{ errors.phone }}</p>
             </div>
           </div>
 
@@ -282,7 +303,6 @@ function submitForm() {
             <label for="linkedin">LinkedIn Profile</label>
             <div>
               <InputText id="linkedin" v-model="form.linkedin" type="url" />
-              <p class="error-text">linkedin profile error</p>
             </div>
           </div>
         </div>
@@ -308,7 +328,7 @@ function submitForm() {
                 placeholder="Select education level"
                 required
               />
-              <p class="error-text">education level error</p>
+              <p class="error-text" v-if="errors.educationLevel">{{ errors.educationLevel }}</p>
             </div>
           </div>
 
@@ -406,7 +426,7 @@ function submitForm() {
                 placeholder="Select source"
                 required
               />
-              <p class="error-text">source of application error</p>
+              <p class="error-text" v-if="errors.sourceApplication">{{ errors.sourceApplication }}</p>
             </div>
           </div>
         </div>
