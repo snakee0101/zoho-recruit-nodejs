@@ -11,6 +11,8 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import MultiSelect from 'primevue/multiselect'
 
+const showSuccess = ref(false)
+
 const step = ref(1)
 const form = reactive({
   // Step 1 fields
@@ -122,10 +124,34 @@ function selectFiles(event) {
   form.resume = event.files
 }
 
+function resetForm() {
+  for (const key in form) {
+    if (Array.isArray(form[key])) {
+      form[key] = []
+    } else {
+      form[key] = null
+    }
+  }
+
+  // Optional: reset resume file manually and switch to step 1
+  form.firstName = ''
+  form.lastName = ''
+  form.email = ''
+  form.phone = ''
+  form.address = ''
+  form.linkedin = ''
+  form.resume = []
+  step.value = 1
+}
+
+
 function submitForm() {
   axios.post('http://localhost:3001/api/form_submissions', form)
       .then(response => {
-        console.log(response.data)
+          showSuccess.value = true
+          resetForm()
+
+          setTimeout(() => showSuccess.value = false, 2000)
       })
 }
 </script>
@@ -358,6 +384,11 @@ function submitForm() {
         <Button @click="goToStep(1)">Previous</Button>
         <Button @click="submitForm">Submit</Button>
       </div>
+    </div>   
+    
+    <!--Success message-->
+    <div class="success-message" v-if="showSuccess">
+      Form submitted successfully!
     </div>
   </main>
 </template>
@@ -431,5 +462,18 @@ label {
   display: flex;
   justify-content: flex-end;
   margin-top: 2rem;
+}
+
+.success-message {
+  max-width: 1000px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  transition: 0.2s;
 }
 </style>
