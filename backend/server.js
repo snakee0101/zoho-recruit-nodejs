@@ -40,6 +40,26 @@ app.get('/api/form_submissions', (req, res) => {
   });
 });
 
+app.post('/api/is_token_valid', (req, res) => {
+  if (req.body.token == null) {
+    return res.status(200).json({ valid: false });
+  }
+  
+  User.findOne({
+    where: {
+      token: req.body.token
+    }
+  }).then((user) => {
+    if (user) {
+      res.status(200).json({ valid: true });
+    } else {
+      res.status(200).json({ valid: false });
+    }
+  }).catch((error) => {
+      res.status(200).json({ valid: false });
+  });
+});
+
 app.post('/api/login', (req, res) => { 
   //найти пользователя по email
   User.findOne({
