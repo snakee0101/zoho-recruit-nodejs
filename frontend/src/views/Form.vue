@@ -116,8 +116,33 @@ const getFileNames = computed(() => {
   return form.resume.map(file => file.name).join(', ')
 })
 
-function goToStep(n) {
-  step.value = n
+function validateStep1() {
+  const requiredFields = [
+    form.firstName,
+    form.lastName,
+    form.email,
+    form.phone,
+    form.dob,
+    form.position,
+  ]
+  const hasResume = form.resume.length > 0
+
+  return requiredFields.every(f => f !== null && f !== '') && hasResume
+}
+
+
+function goToStep1() {
+  step.value = 1;
+}
+
+function goToStep2() {
+  if (!validateStep1()) {
+    alert('Enter the values for all required fields and upload your resume.');
+
+    return
+  }
+
+  step.value = 2;
 }
 
 function selectFiles(event) {
@@ -143,7 +168,6 @@ function resetForm() {
   form.resume = []
   step.value = 1
 }
-
 
 function submitForm() {
   axios.post('http://localhost:3001/api/form_submissions', form)
@@ -257,7 +281,7 @@ function submitForm() {
       </div>
 
       <div class="buttons-1">
-        <Button @click="goToStep(2)">Next</Button>
+        <Button @click="goToStep2()">Next</Button>
       </div>
     </div>
 
@@ -381,7 +405,7 @@ function submitForm() {
       </div>
 
       <div class="buttons">
-        <Button @click="goToStep(1)">Previous</Button>
+        <Button @click="goToStep1()">Previous</Button>
         <Button @click="submitForm">Submit</Button>
       </div>
     </div>   
