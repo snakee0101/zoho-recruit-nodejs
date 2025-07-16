@@ -18,4 +18,12 @@ const router = createRouter({
   ],
 })
 
+router.beforeEach((to, from) => {
+  if (to.name === 'list' && from.name === 'form') {
+    if (confirm('Warning! All data entered into the form will be lost. Are you sure to proceed?') === false) {
+        return false;
+    } 
+  }
+})
+
 export default router
