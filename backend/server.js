@@ -8,23 +8,29 @@ const port = 3001;
 app.use(express.json());
 app.use(cors()); //allow requests from frontend (npm install cors --save)
 
-app.get('/api/form_submissions', (req, res) => {
-  const sequelize = new Sequelize('zoho_recruit', 'postgres', 'postgres', {
-    host: 'localhost',
-    dialect: 'postgres'
-  });
+//initialize sequalize
+const sequelize = new Sequelize('zoho_recruit', 'postgres', 'postgres', {
+  host: 'localhost',
+  dialect: 'postgres'
+});
 
-  try {
+try {
     sequelize.authenticate(); 
-
-    const FormSubmission = require('./models/form_submission')(sequelize)
-    
-    FormSubmission.findAll().then((submissions) => {
-        res.json(submissions);
-    });
-  } catch (error) {
+} catch (error) {
     console.error('Unable to connect to the database:', error);
-  }
+}
+  
+//routes
+app.get('/api/form_submissions', (req, res) => {
+  const FormSubmission = require('./models/form_submission')(sequelize)
+    
+  FormSubmission.findAll().then((submissions) => {
+    res.json(submissions);
+  });
+});
+
+app.post('/api/form_submissions', (req, res) => {
+  res.send(req.body);
 });
 
 app.listen(port, () => {

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
+import axios from 'axios'
 
 import InputMask from 'primevue/inputmask'
 import Textarea from 'primevue/textarea'
@@ -122,8 +123,10 @@ function selectFiles(event) {
 }
 
 function submitForm() {
-  console.log('Submitted:', form)
-  alert('Candidate submitted successfully!')
+  axios.post('http://localhost:3001/api/form_submissions', form)
+      .then(response => {
+        console.log(response.data)
+      })
 }
 </script>
 
