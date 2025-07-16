@@ -29,14 +29,22 @@ function validateLogin() {
 async function submitLogin() {
   if (!validateLogin()) return
 
-  try {
-    const response = await axios.post('http://localhost:3001/api/login', loginForm)
-    loginSuccess.value = true
-    setTimeout(() => loginSuccess.value = false, 2000)
-  } catch (err) {
-    loginErrors.invalid_credentials = err.response.data.error
-    setTimeout(() => loginErrors.invalid_credentials = '', 2000)
-  }
+  axios.post('http://localhost:3001/api/login', loginForm)
+      .then(response => {
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
+
+        loginSuccess.value = true;
+        setTimeout(() => {
+          loginSuccess.value = false;
+          window.location.href = '/list';
+        }, 2000);
+      })
+      .catch(err => {
+        loginErrors.invalid_credentials = err.response?.data?.error || 'Login failed';
+        setTimeout(() => loginErrors.invalid_credentials = '', 2000);
+      });
 }
 </script>
 

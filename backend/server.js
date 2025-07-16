@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors')
 const { Sequelize, QueryTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
 
 const jwt = require('jsonwebtoken');
  
@@ -58,7 +59,7 @@ app.post('/api/login', (req, res) => {
           email: req.body.email
         }
       }).then(() => {
-        //сохранить token в cookie
+        res.status(200).json({ token: token }); //отправим token на клиент где сохраним его в localStorage
       });      
     } else {
       res.status(401).json({ error: 'Invalid credentials' }); //иначе - ошибка
