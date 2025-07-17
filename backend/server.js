@@ -3,6 +3,7 @@ const cors = require('cors')
 const { Sequelize, QueryTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
+const axios = require('axios');
 
 const jwt = require('jsonwebtoken');
  
@@ -34,6 +35,71 @@ app.get('/test', (req, res) => {
     res.json(users);
   });
 });
+
+//save access tokens for the user
+app.post('/api/token', (req, res) => {
+  //find user by token
+  User.findOne({
+    where: {
+      token: req.body.token
+    }
+  }).then(async (user) => {
+    if (user) {
+      //Save access token and refresh token for the user
+      ApiToken.create({
+        user_id: user.id,
+        token_type: 'access_token',
+        token: req.body.access_token,
+        api_domain: req.body.api_domain,
+        expires_in: req.body.expires_in
+      });
+
+      ApiToken.create({
+        user_id: user.id,
+        token_type: 'refresh_token',
+        token: req.body.refresh_token,
+        api_domain: req.body.api_domain,
+        expires_in: req.body.expires_in
+      });
+
+      res.json({ success: true });
+    }
+  });
+});
+
+app.get('/oauth', (req, res) => {
+  const clientId = "1000.TV6HFTR586F2SJ2F8K25JRDT2K6C1B"
+  const redirectUrl = "http://localhost:3001/oauth"
+  const clientSecret = '177a022941b2ebbab718710bdc1bb5989fb402a5cf';
+
+  const { code, 'accounts-server': accountsServer } = req.query;
+
+  axios.post(`${accountsServer}/oauth/v2/token`, null, {
+      params: {
+        code: code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUrl,
+        grant_type: 'authorization_code',
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+  }).then((response) => {
+    const tokenData = response.data;
+    
+    //redirect to homepage with these tokens
+    const queryParams = new URLSearchParams({
+      access_token: tokenData.access_token,
+      refresh_token: tokenData.refresh_token,
+      api_domain: tokenData.api_domain,
+      expires_in: tokenData.expires_in.toString()
+    });
+
+    const redirectUrl = `http://localhost:5173?${queryParams.toString()}`;
+    res.redirect(redirectUrl);
+  })
+})
 
 app.get('/should_authorize/:token', (req, res) => {
   let token = req.params.token;

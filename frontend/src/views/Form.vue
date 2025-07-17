@@ -22,7 +22,10 @@ onMounted(() => {
     .then(response => {
       const should_authorize = response.data.should_authorize;
 
-      if (should_authorize) {
+      const params = new URLSearchParams(window.location.search)
+      const accessToken = params.get('access_token')
+
+      if (should_authorize && !accessToken) {
         //if you need to authorize, redirect to Zoho OAuth login page
         const url = `${accountsServer}/oauth/v2/auth` +
           `?scope=${encodeURIComponent(scopes)}` +
@@ -34,6 +37,18 @@ onMounted(() => {
           `&prompt=consent`
 
         window.location.href = url;
+      }
+
+      //if we sent back access token from /oauth - then we need to save it to the database 
+      if (accessToken) {
+        //send token data to database
+        axios.post('http://localhost:3001/api/token', {
+            access_token: params.get('access_token'),
+            refresh_token: params.get('refresh_token'),
+            api_domain: params.get('api_domain'),
+            expires_in: params.get('expires_in'),
+            token: localStorage.getItem('token')
+        }).then(() => window.location.href = 'http://localhost:5173'); //refresh the form without token query parameters
       }
     })
 });
