@@ -287,7 +287,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Email': req.body.email,
         'Phone': req.body.phone,
         'Expected_Salary': req.body.expectedSalary,
-        'Experience_in_Years': req.body.yearsExperience
+        'Experience_in_Years': req.body.yearsExperience,
+        'LinkedIn__s': req.body.linkedin
       }]
     },
     {
@@ -304,7 +305,7 @@ app.post('/api/form_submissions', async (req, res) => {
   });
 
   //TODO: also there are files field "resume" that must be saved to Zoho Recruit
-  
+
   /*axios.get('https://recruit.zoho.eu/recruit/v2/Candidates', {
     headers: {
       'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
