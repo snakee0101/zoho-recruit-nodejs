@@ -263,26 +263,55 @@ async function refresh_tokens(user) {
 }
 
 app.post('/api/form_submissions', async (req, res) => {
-    //1. get user by token 
-    const user = await User.findOne({
-      where: {
-        token: req.body.token
-      }
-    });
-
-    if (!user) {
-      return res.status(500).json({ error: 'Cannot find user' });
+  //1. get user by token 
+  const user = await User.findOne({
+    where: {
+      token: req.body.token
     }
+  });
 
-    //2. get new tokens
-    const userTokens = await refresh_tokens(user); //{"access_token": "...", "refresh_token": "..."}
+  if (!user) {
+    return res.status(500).json({ error: 'Cannot find user' });
+  }
 
-    //3. send API request
+  //2. get new tokens
+  const userTokens = await refresh_tokens(user); //{"access_token": "...", "refresh_token": "..."}
+
+  //3. send API request
+  axios.post(
+    'https://recruit.zoho.eu/recruit/v2/Candidates',
+    {
+      data: [{
+        'First_Name': req.body.firstName,
+        'Last_Name': req.body.lastName,
+      }]
+    },
+    {
+      headers: {
+        'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
+      }
+    }
+  )
+  .then((response) => {
+    res.status(200).json(response.data);
+  })
+  .catch((error) => {
+    res.status(500).json(error.response?.data || { error: 'Request failed' });
+  });
+
+  //TODO: also there are files field "resume" that must be saved to Zoho Recruit
+  /*axios.get('https://recruit.zoho.eu/recruit/v2/Candidates', {
+    headers: {
+      'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
+    }
+  }).then((response) => {
+    res.status(200).json(response.data);
+  }).catch((error) => {
+    res.status(500).json(error);
+  });*/
   
   /*try {
     FormSubmission.create({
-      first_name: req.body.firstName,
-      last_name: req.body.lastName,
       email: req.body.email,
       phone: req.body.phone,
       address: req.body.address,
