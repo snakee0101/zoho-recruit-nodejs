@@ -223,8 +223,40 @@ async function refresh_tokens(user) {
   //2. Refresh access token if it is expired
   if(is_access_token_expired(access_token)) {
     //2.1. refresh tokens
+    const accountsServer = 'https://accounts.zoho.eu';
+    const refreshToken = tokens.refresh_token;
+    const clientId = '1000.TV6HFTR586F2SJ2F8K25JRDT2K6C1B';
+    const clientSecret = '177a022941b2ebbab718710bdc1bb5989fb402a5cf';
+    const redirectUrl = 'http://localhost:3001/oauth';
+
+    const url = `${accountsServer}/oauth/v2/token`;
+
+    const params = new URLSearchParams({
+      refresh_token: refreshToken,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUrl,
+      grant_type: 'refresh_token'
+    });
+
+    response = await axios.post(url, params);
+    let newTokenData = response.data;
+    
     //2.2. save new access token to db
+    await ApiToken.update({
+      token: newTokenData.access_token,
+      api_domain: newTokenData.api_domain,
+      expires_in: newTokenData.expires_in,
+      updated_at: new Date()
+    }, {
+      where: {
+        user_id: user.id,
+        token_type: 'access_token'
+      },
+    });
+
     //2.3. replace access token in tokens object
+    tokens.access_token = newTokenData.access_token;
   }
 
   return tokens;
@@ -243,10 +275,10 @@ app.post('/api/form_submissions', async (req, res) => {
     }
 
     //2. get new tokens
-    const userTokens = await refresh_tokens(user);
-    
-    return res.status(200).json(userTokens);
+    const userTokens = await refresh_tokens(user); //{"access_token": "...", "refresh_token": "..."}
 
+    //3. send API request
+  
   /*try {
     FormSubmission.create({
       first_name: req.body.firstName,

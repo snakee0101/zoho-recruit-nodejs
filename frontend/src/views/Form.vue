@@ -90,8 +90,7 @@ const form = reactive({
   availabilityInterview: null, //date-time
   preferredLocation: null,
   coverLetter: '',
-  sourceApplication: null,
-  token: localStorage.getItem('token')
+  sourceApplication: null
 })
 
 const positions = [
@@ -244,7 +243,7 @@ function submitForm() {
     return
   }
 
-  axios.post('http://localhost:3001/api/form_submissions', form)
+  axios.post('http://localhost:3001/api/form_submissions', { ...form, token: localStorage.getItem('token') })
       .then(response => {
           showSuccess.value = true
           resetForm()
