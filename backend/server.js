@@ -284,6 +284,10 @@ app.post('/api/form_submissions', async (req, res) => {
       data: [{
         'First_Name': req.body.firstName,
         'Last_Name': req.body.lastName,
+        'Email': req.body.email,
+        'Phone': req.body.phone,
+        'Expected_Salary': req.body.expectedSalary,
+        'Experience_in_Years': req.body.yearsExperience
       }]
     },
     {
@@ -300,6 +304,7 @@ app.post('/api/form_submissions', async (req, res) => {
   });
 
   //TODO: also there are files field "resume" that must be saved to Zoho Recruit
+  
   /*axios.get('https://recruit.zoho.eu/recruit/v2/Candidates', {
     headers: {
       'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
@@ -312,19 +317,15 @@ app.post('/api/form_submissions', async (req, res) => {
   
   /*try {
     FormSubmission.create({
-      email: req.body.email,
-      phone: req.body.phone,
       address: req.body.address,
       dob: req.body.dob,
       position: req.body.position,
       linkedin: req.body.linkedin,
-      education_level: req.body.educationLevel,
-      years_experience: req.body.yearsExperience,
+      education_level: req.body.educationLevel,,
       skills: req.body.skills,
       previous_employer: req.body.previousEmployer,
       current_job_title: req.body.currentJobTitle,
       notice_period: req.body.noticePeriod,
-      expected_salary: req.body.expectedSalary,
       availability_interview: req.body.availabilityInterview,
       preferred_location: req.body.preferredLocation,
       cover_letter: req.body.coverLetter,
