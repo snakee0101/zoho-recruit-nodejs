@@ -195,24 +195,58 @@ app.post('/api/login', (req, res) => {
   });
 }); 
 
-function refresh_tokens(user) {
+function is_access_token_expired(accessToken) {
+  const expiresInSeconds = parseInt(accessToken.expires_in, 10);
+  const updatedAt = new Date(accessToken.updated_at);
+  const expirationTime = new Date(updatedAt.getTime() + expiresInSeconds * 1000);
+  const now = new Date();
 
+  return now >= expirationTime; 
 }
 
-app.post('/api/form_submissions', (req, res) => {
-  //1. find user by token
-  User.findOne({
+async function refresh_tokens(user) {
+  //1. Get initial tokens
+  let tokensResponse = await ApiToken.findAll({
     where: {
-      token: req.body.token
+      user_id: user.id
     }
-  }).then((user) => { 
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(500).json({ error: 'Cannot find user' });
+  });
+
+  let access_token = tokensResponse.find(token => token.token_type === 'access_token');
+  let refresh_token = tokensResponse.find(token => token.token_type === 'refresh_token');
+
+  let tokens = {
+    'access_token': access_token.token,
+    'refresh_token': refresh_token.token
+  };
+
+  //2. Refresh access token if it is expired
+  if(is_access_token_expired(access_token)) {
+    //2.1. refresh tokens
+    //2.2. save new access token to db
+    //2.3. replace access token in tokens object
+  }
+
+  return tokens;
+}
+
+app.post('/api/form_submissions', async (req, res) => {
+    //1. get user by token 
+    const user = await User.findOne({
+      where: {
+        token: req.body.token
+      }
+    });
+
+    if (!user) {
+      return res.status(500).json({ error: 'Cannot find user' });
     }
-  })
-  
+
+    //2. get new tokens
+    const userTokens = await refresh_tokens(user);
+    
+    return res.status(200).json(userTokens);
+
   /*try {
     FormSubmission.create({
       first_name: req.body.firstName,
