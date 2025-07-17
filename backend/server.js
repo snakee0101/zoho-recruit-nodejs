@@ -195,8 +195,25 @@ app.post('/api/login', (req, res) => {
   });
 }); 
 
+function refresh_tokens(user) {
+
+}
+
 app.post('/api/form_submissions', (req, res) => {
-  try {
+  //1. find user by token
+  User.findOne({
+    where: {
+      token: req.body.token
+    }
+  }).then((user) => { 
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(500).json({ error: 'Cannot find user' });
+    }
+  })
+  
+  /*try {
     FormSubmission.create({
       first_name: req.body.firstName,
       last_name: req.body.lastName,
@@ -225,7 +242,7 @@ app.post('/api/form_submissions', (req, res) => {
   } catch (error) {
     console.error('Failed to save form submission:', error);
     res.status(500).json({ error: 'Failed to save submission' });
-  }
+  }*/
 });
 
 app.listen(port, () => {

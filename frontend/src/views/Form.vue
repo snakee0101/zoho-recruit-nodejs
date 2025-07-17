@@ -91,6 +91,7 @@ const form = reactive({
   preferredLocation: null,
   coverLetter: '',
   sourceApplication: null,
+  token: localStorage.getItem('token')
 })
 
 const positions = [
