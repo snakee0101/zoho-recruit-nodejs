@@ -26,6 +26,7 @@ try {
 
 const FormSubmission = require('./models/form_submission')(sequelize)
 const User = require('./models/user')(sequelize)
+const ApiToken = require('./models/api_token')(sequelize)
   
 //routes
 app.get('/test', (req, res) => {
@@ -34,6 +35,32 @@ app.get('/test', (req, res) => {
   });
 });
 
+app.get('/should_authorize/:token', (req, res) => {
+  let token = req.params.token;
+  
+  //find user by token
+  User.findOne({
+    where: {
+      token: token
+    }
+  }).then(async (user) => {
+    if (user) {
+      // Check if refresh_token exists for this user
+      const refreshToken = await ApiToken.findOne({
+        where: {
+          user_id: user.id,
+          token_type: 'refresh_token',
+        }
+      });
+
+      // If no refresh_token found, authorize
+      const shouldAuthorize = !refreshToken;
+
+      return res.status(200).json({ should_authorize: shouldAuthorize });
+    }
+  });
+});
+  
 app.get('/api/form_submissions', (req, res) => {
   FormSubmission.findAll().then((submissions) => {
     res.json(submissions);

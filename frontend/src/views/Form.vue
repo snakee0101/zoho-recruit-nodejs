@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import axios from 'axios'
 
 import InputMask from 'primevue/inputmask'
@@ -10,6 +10,33 @@ import FileUpload from 'primevue/fileupload'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import MultiSelect from 'primevue/multiselect'
+
+onMounted(() => {
+  const accountsServer = "https://accounts.zoho.eu"
+  const clientId = "1000.TV6HFTR586F2SJ2F8K25JRDT2K6C1B"
+  const redirectUrl = "http://localhost:3001/oauth"
+  const scopes = 'ZohoRECRUIT.modules.all'
+
+  //check whether you need to authorize
+  axios.get('http://localhost:3001/should_authorize/' + localStorage.getItem('token'))
+    .then(response => {
+      const should_authorize = response.data.should_authorize;
+
+      if (should_authorize) {
+        //if you need to authorize, redirect to Zoho OAuth login page
+        const url = `${accountsServer}/oauth/v2/auth` +
+          `?scope=${encodeURIComponent(scopes)}` +
+          `&client_id=${clientId}` +
+          `&state=testing` +
+          `&response_type=code` +
+          `&redirect_uri=${encodeURIComponent(redirectUrl)}` +
+          `&access_type=offline` +
+          `&prompt=consent`
+
+        window.location.href = url;
+      }
+    })
+});
 
 const showSuccess = ref(false)
 const errors = reactive({
