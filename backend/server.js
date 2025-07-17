@@ -288,7 +288,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Phone': req.body.phone,
         'Expected_Salary': req.body.expectedSalary,
         'Experience_in_Years': req.body.yearsExperience,
-        'LinkedIn__s': req.body.linkedin
+        'LinkedIn__s': req.body.linkedin,
+        'Skill_Set': req.body.skills.join(', ')
       }]
     },
     {
@@ -321,9 +322,7 @@ app.post('/api/form_submissions', async (req, res) => {
       address: req.body.address,
       dob: req.body.dob,
       position: req.body.position,
-      linkedin: req.body.linkedin,
-      education_level: req.body.educationLevel,,
-      skills: req.body.skills,
+      education_level: req.body.educationLevel,
       previous_employer: req.body.previousEmployer,
       current_job_title: req.body.currentJobTitle,
       notice_period: req.body.noticePeriod,
