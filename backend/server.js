@@ -37,34 +37,47 @@ app.get('/test', (req, res) => {
 });
 
 //save access tokens for the user
-app.post('/api/token', (req, res) => {
-  //find user by token
-  User.findOne({
-    where: {
-      token: req.body.token
-    }
-  }).then(async (user) => {
-    if (user) {
-      //Save access token and refresh token for the user
-      ApiToken.create({
-        user_id: user.id,
-        token_type: 'access_token',
-        token: req.body.access_token,
-        api_domain: req.body.api_domain,
-        expires_in: req.body.expires_in
-      });
+app.post('/api/token', async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where: {
+        token: req.body.token
+      }
+    });
 
-      ApiToken.create({
-        user_id: user.id,
-        token_type: 'refresh_token',
-        token: req.body.refresh_token,
-        api_domain: req.body.api_domain,
-        expires_in: req.body.expires_in
-      });
-
-      res.json({ success: true });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  });
+
+    const commonFields = {
+      user_id: user.id,
+      api_domain: req.body.api_domain,
+      expires_in: req.body.expires_in
+    };
+
+    // Upsert access_token
+    await ApiToken.upsert({
+      ...commonFields,
+      token_type: 'access_token',
+      token: req.body.access_token
+    }, {
+      conflictFields: ['user_id', 'token_type']
+    });
+
+    // Upsert refresh_token
+    await ApiToken.upsert({
+      ...commonFields,
+      token_type: 'refresh_token',
+      token: req.body.refresh_token
+    }, {
+      conflictFields: ['user_id', 'token_type']
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Token saving failed:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.get('/oauth', (req, res) => {

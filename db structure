@@ -96,3 +96,5 @@ VALUES (1, 'authorization_code', 'authcode_abc123', 'https://accounts.zoho.eu', 
 (2, 'authorization_code', 'authcode_qwe987', 'https://api.example.com', 600, NOW(), NOW()),
 (2, 'access_token', 'access_jkl654', 'https://api.example.com', 1800, NOW(), NOW()),
 (2, 'refresh_token', 'refresh_mno321', 'https://api.example.com', NULL, NOW(), NOW());
+
+CREATE UNIQUE INDEX unique_user_token_type ON api_tokens (user_id, token_type);
