@@ -295,7 +295,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Educational_Details': [{
           'Degree': req.body.educationLevel,
         }],
-        'Previous_Employer': req.body.previousEmployer
+        'Previous_Employer': req.body.previousEmployer,
+        'Notice_Period': req.body.noticePeriod
       }]
     },
     {
@@ -328,7 +329,6 @@ app.post('/api/form_submissions', async (req, res) => {
       address: req.body.address,
       dob: req.body.dob,
       position: req.body.position,
-      notice_period: req.body.noticePeriod,
       availability_interview: req.body.availabilityInterview,
       preferred_location: req.body.preferredLocation,
       cover_letter: req.body.coverLetter,
