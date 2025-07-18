@@ -294,7 +294,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Current_Job_Title': req.body.currentJobTitle,
         'Educational_Details': [{
           'Degree': req.body.educationLevel,
-        }]
+        }],
+        'Previous_Employer': req.body.previousEmployer
       }]
     },
     {
@@ -327,7 +328,6 @@ app.post('/api/form_submissions', async (req, res) => {
       address: req.body.address,
       dob: req.body.dob,
       position: req.body.position,
-      previous_employer: req.body.previousEmployer,
       notice_period: req.body.noticePeriod,
       availability_interview: req.body.availabilityInterview,
       preferred_location: req.body.preferredLocation,
