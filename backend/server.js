@@ -307,7 +307,8 @@ app.post('/api/form_submissions', async (req, res) => {
         }],
         'Previous_Employer': req.body.previousEmployer,
         'Notice_Period': req.body.noticePeriod,
-        'Date_Of_Birth': formatDateToYMD(req.body.dob)
+        'Date_Of_Birth': formatDateToYMD(req.body.dob),
+        'Preferred_Location': req.body.preferredLocation
       }]
     },
     {
@@ -340,7 +341,6 @@ app.post('/api/form_submissions', async (req, res) => {
       address: req.body.address,
       position: req.body.position,
       availability_interview: req.body.availabilityInterview,
-      preferred_location: req.body.preferredLocation,
       cover_letter: req.body.coverLetter,
     }).then((submission) => {
       res.status(201).json(submission);
