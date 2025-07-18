@@ -290,7 +290,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Experience_in_Years': req.body.yearsExperience,
         'LinkedIn__s': req.body.linkedin,
         'Skill_Set': req.body.skills.join(', '),
-        'Source': req.body.sourceApplication
+        'Source': req.body.sourceApplication,
+        'Current_Job_Title': req.body.currentJobTitle
       }]
     },
     {
@@ -325,7 +326,6 @@ app.post('/api/form_submissions', async (req, res) => {
       position: req.body.position,
       education_level: req.body.educationLevel, //Correct Name: Highest Education Held
       previous_employer: req.body.previousEmployer,
-      current_job_title: req.body.currentJobTitle,
       notice_period: req.body.noticePeriod,
       availability_interview: req.body.availabilityInterview,
       preferred_location: req.body.preferredLocation,
