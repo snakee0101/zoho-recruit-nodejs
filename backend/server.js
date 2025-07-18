@@ -262,6 +262,16 @@ async function refresh_tokens(user) {
   return tokens;
 }
 
+function formatDateToYMD(isoString) {
+  const date = new Date(isoString);
+
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+  const day = String(date.getUTCDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
 app.post('/api/form_submissions', async (req, res) => {
   //1. get user by token 
   const user = await User.findOne({
@@ -296,7 +306,8 @@ app.post('/api/form_submissions', async (req, res) => {
           'Degree': req.body.educationLevel,
         }],
         'Previous_Employer': req.body.previousEmployer,
-        'Notice_Period': req.body.noticePeriod
+        'Notice_Period': req.body.noticePeriod,
+        'Date_Of_Birth': formatDateToYMD(req.body.dob)
       }]
     },
     {
@@ -327,7 +338,6 @@ app.post('/api/form_submissions', async (req, res) => {
   /*try {
     FormSubmission.create({
       address: req.body.address,
-      dob: req.body.dob,
       position: req.body.position,
       availability_interview: req.body.availabilityInterview,
       preferred_location: req.body.preferredLocation,
