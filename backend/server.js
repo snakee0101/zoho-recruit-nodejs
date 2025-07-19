@@ -316,7 +316,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Preferred_Location': req.body.preferredLocation,
         'Cover_Letter_Text': req.body.coverLetter,
         'Availability_For_Interview': trimMilliseconds(req.body.availabilityInterview),
-        'Position_Applied_For': req.body.position
+        'Position_Applied_For': req.body.position,
+        'Current_Address': req.body.address
       }]
     },
     {
@@ -344,9 +345,28 @@ app.post('/api/form_submissions', async (req, res) => {
     res.status(500).json(error);
   });*/
   
-  /*try {
+  //4. save form submission to database
+  try {
     FormSubmission.create({
+      first_name: req.body.firstName,
+      last_name: req.body.lastName,
+      email: req.body.email,
+      phone: req.body.phone,
       address: req.body.address,
+      dob: req.body.dob,
+      position: req.body.position,
+      linkedin: req.body.linkedin,
+      education_level: req.body.educationLevel,
+      years_experience: req.body.yearsExperience,
+      skills: req.body.skills,
+      previous_employer: req.body.previousEmployer,
+      current_job_title: req.body.currentJobTitle,
+      notice_period: req.body.noticePeriod,
+      expected_salary: req.body.expectedSalary,
+      availability_interview: req.body.availabilityInterview,
+      preferred_location: req.body.preferredLocation,
+      cover_letter: req.body.coverLetter,
+      source_application: req.body.sourceApplication,
     }).then((submission) => {
       res.status(201).json(submission);
     }).catch((error) => {
@@ -355,7 +375,7 @@ app.post('/api/form_submissions', async (req, res) => {
   } catch (error) {
     console.error('Failed to save form submission:', error);
     res.status(500).json({ error: 'Failed to save submission' });
-  }*/
+  }
 });
 
 app.listen(port, () => {
