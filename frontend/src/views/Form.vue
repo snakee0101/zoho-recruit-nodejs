@@ -76,7 +76,7 @@ const form = reactive({
   address: '',
   dob: null, //date
   position: null,
-  resume: [], //isn't included in database structure
+  resume: null, //isn't included in database structure
   linkedin: '',
 
   // Step 2 fields
@@ -165,10 +165,6 @@ const skillsOptions = computed(() => {
   return skillsOptionsMap[form.position]
 })
 
-const getFileNames = computed(() => {
-  return form.resume.map(file => file.name).join(', ')
-})
-
 function validateStep1() {
   errors.first_name = form.firstName.trim() ? '' : 'First name is required.'
   errors.last_name = form.lastName.trim() ? '' : 'Last name is required.'
@@ -176,7 +172,7 @@ function validateStep1() {
   errors.phone = form.phone.trim() ? '' : 'Phone number is required.'
   errors.dob = form.dob ? '' : 'Date of birth is required.'
   errors.position = form.position ? '' : 'Position must be selected.'
-  errors.resume = form.resume.length > 0 ? '' : 'Resume is required.'
+  errors.resume = form.resume ? '' : 'Resume is required.'
 
   return (
     !errors.first_name &&
@@ -214,7 +210,7 @@ function goToStep2() {
 }
 
 function selectFiles(event) {
-  form.resume = event.files
+  form.resume = event.files[0]
 }
 
 function resetForm() {
@@ -233,7 +229,7 @@ function resetForm() {
   form.phone = ''
   form.address = ''
   form.linkedin = ''
-  form.resume = []
+  form.resume = null
   step.value = 1
 }
 
@@ -243,7 +239,16 @@ function submitForm() {
     return
   }
 
-  axios.post('http://localhost:3001/api/form_submissions', { ...form, token: localStorage.getItem('token') })
+  //convert to form data to be able to send files
+  const formData = new FormData()
+
+  for (const key in form) {
+    formData.append(key, form[key])
+  }
+
+  formData.append('token', localStorage.getItem('token'))
+
+  axios.post('http://localhost:3001/api/form_submissions', formData)
       .then(response => {
           showSuccess.value = true
           resetForm()
@@ -305,14 +310,12 @@ function submitForm() {
             <div>
               <FileUpload
                 id="resume"
-                name="resume[]"
-                :multiple="true"
+                name="resume"
                 mode="basic"
                 accept=".pdf,.doc,.docx"
                 @select="selectFiles"
                 required
               />
-              <div v-if="form.resume" class="resume-name">Selected: {{ getFileNames }}</div>
               <p class="error-text" v-if="errors.resume">{{ errors.resume }}</p>
             </div>
           </div>
