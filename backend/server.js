@@ -4,6 +4,7 @@ const { Sequelize, QueryTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
+const { DateTime } = require('luxon');
 
 const jwt = require('jsonwebtoken');
  
@@ -272,6 +273,10 @@ function formatDateToYMD(isoString) {
   return `${year}-${month}-${day}`;
 }
 
+function trimMilliseconds(timestampString) {
+  return timestampString.split('.')[0];
+}
+
 app.post('/api/form_submissions', async (req, res) => {
   //1. get user by token 
   const user = await User.findOne({
@@ -309,7 +314,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Notice_Period': req.body.noticePeriod,
         'Date_Of_Birth': formatDateToYMD(req.body.dob),
         'Preferred_Location': req.body.preferredLocation,
-        'Cover_Letter_Text': req.body.coverLetter
+        'Cover_Letter_Text': req.body.coverLetter,
+        'Availability_For_Interview': trimMilliseconds(req.body.availabilityInterview)
       }]
     },
     {
@@ -341,7 +347,6 @@ app.post('/api/form_submissions', async (req, res) => {
     FormSubmission.create({
       address: req.body.address,
       position: req.body.position,
-      availability_interview: req.body.availabilityInterview,
     }).then((submission) => {
       res.status(201).json(submission);
     }).catch((error) => {
