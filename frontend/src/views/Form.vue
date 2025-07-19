@@ -239,16 +239,7 @@ function submitForm() {
     return
   }
 
-  //convert to form data to be able to send files
-  const formData = new FormData()
-
-  for (const key in form) {
-    formData.append(key, form[key])
-  }
-
-  formData.append('token', localStorage.getItem('token'))
-
-  axios.post('http://localhost:3001/api/form_submissions', formData)
+  axios.post('http://localhost:3001/api/form_submissions', {...form, token: localStorage.getItem('token')})
       .then(response => {
           showSuccess.value = true
           resetForm()

@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
 const { DateTime } = require('luxon');
-const multer = require('multer'); //middleware for processing multipart/form-data
 
 const jwt = require('jsonwebtoken');
  
@@ -275,13 +274,10 @@ function formatDateToYMD(isoString) {
 }
 
 function trimMilliseconds(timestampString) {
-  return timestampString ? timestampString.split('.')[0] : null;
+  return timestampString.split('.')[0];
 }
 
-const storage = multer.memoryStorage(); // multipart/form-data processing (file uploads)
-const upload = multer({ storage: storage });
-
-app.post('/api/form_submissions', upload.single('resume'), async (req, res) => { //define a "resume" field as file field
+app.post('/api/form_submissions', async (req, res) => {
   //1. get user by token 
   const user = await User.findOne({
     where: {
@@ -296,13 +292,6 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
   //2. get new tokens
   const userTokens = await refresh_tokens(user); //{"access_token": "...", "refresh_token": "..."}
 
-  //warning! replace "null" values (multer transforms nulls into strings) with true null
-  for (const [key, value] of Object.entries(req.body)) {
-    if (value === 'null') {
-      req.body[key] = null;
-    }
-  }
-  
   //3. send API request
   axios.post(
     'https://recruit.zoho.eu/recruit/v2/Candidates',
@@ -315,7 +304,7 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
         'Expected_Salary': req.body.expectedSalary,
         'Experience_in_Years': req.body.yearsExperience,
         'LinkedIn__s': req.body.linkedin,
-        'Skill_Set': req.body.skills.length > 0 ? req.body.skills.join(', ') : '',
+        'Skill_Set': req.body.skills.join(', '),
         'Source': req.body.sourceApplication,
         'Current_Job_Title': req.body.currentJobTitle,
         'Educational_Details': [{
@@ -338,56 +327,55 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
     }
   )
   .then((response) => {
-    res.json(req.body);
     res.status(200).json(response.data);
-
-    //TODO: also there are files field "resume" that must be saved to Zoho Recruit
-
-    /*axios.get('https://recruit.zoho.eu/recruit/v2/Candidates', {
-      headers: {
-        'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
-      }
-    }).then((response) => {
-      res.status(200).json(response.data);
-    }).catch((error) => {
-      res.status(500).json(error);
-    });*/
-    
-    //4. save form submission to database
-    try {
-      FormSubmission.create({
-        first_name: req.body.firstName,
-        last_name: req.body.lastName,
-        email: req.body.email,
-        phone: req.body.phone,
-        address: req.body.address,
-        dob: req.body.dob,
-        position: req.body.position,
-        linkedin: req.body.linkedin,
-        education_level: req.body.educationLevel,
-        years_experience: req.body.yearsExperience,
-        skills: req.body.skills,
-        previous_employer: req.body.previousEmployer,
-        current_job_title: req.body.currentJobTitle,
-        notice_period: req.body.noticePeriod,
-        expected_salary: req.body.expectedSalary,
-        availability_interview: req.body.availabilityInterview,
-        preferred_location: req.body.preferredLocation,
-        cover_letter: req.body.coverLetter,
-        source_application: req.body.sourceApplication,
-      }).then((submission) => {
-        res.status(201).json(submission);
-      }).catch((error) => {
-        console.log(error);
-      });
-    } catch (error) {
-      console.error('Failed to save form submission:', error);
-      res.status(500).json({ error: 'Failed to save submission' });
-    }
   })
   .catch((error) => {
     res.status(500).json(error.response?.data || { error: 'Request failed' });
   });
+
+  //TODO: also there are files field "resume" that must be saved to Zoho Recruit
+
+  /*axios.get('https://recruit.zoho.eu/recruit/v2/Candidates', {
+    headers: {
+      'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
+    }
+  }).then((response) => {
+    res.status(200).json(response.data);
+  }).catch((error) => {
+    res.status(500).json(error);
+  });*/
+  
+  //4. save form submission to database
+  try {
+    FormSubmission.create({
+      first_name: req.body.firstName,
+      last_name: req.body.lastName,
+      email: req.body.email,
+      phone: req.body.phone,
+      address: req.body.address,
+      dob: req.body.dob,
+      position: req.body.position,
+      linkedin: req.body.linkedin,
+      education_level: req.body.educationLevel,
+      years_experience: req.body.yearsExperience,
+      skills: req.body.skills,
+      previous_employer: req.body.previousEmployer,
+      current_job_title: req.body.currentJobTitle,
+      notice_period: req.body.noticePeriod,
+      expected_salary: req.body.expectedSalary,
+      availability_interview: req.body.availabilityInterview,
+      preferred_location: req.body.preferredLocation,
+      cover_letter: req.body.coverLetter,
+      source_application: req.body.sourceApplication,
+    }).then((submission) => {
+      res.status(201).json(submission);
+    }).catch((error) => {
+      console.log(error);
+    });
+  } catch (error) {
+    console.error('Failed to save form submission:', error);
+    res.status(500).json({ error: 'Failed to save submission' });
+  }
 });
 
 app.listen(port, () => {
