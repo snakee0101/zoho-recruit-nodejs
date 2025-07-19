@@ -315,7 +315,8 @@ app.post('/api/form_submissions', async (req, res) => {
         'Date_Of_Birth': formatDateToYMD(req.body.dob),
         'Preferred_Location': req.body.preferredLocation,
         'Cover_Letter_Text': req.body.coverLetter,
-        'Availability_For_Interview': trimMilliseconds(req.body.availabilityInterview)
+        'Availability_For_Interview': trimMilliseconds(req.body.availabilityInterview),
+        'Position_Applied_For': req.body.position
       }]
     },
     {
@@ -346,7 +347,6 @@ app.post('/api/form_submissions', async (req, res) => {
   /*try {
     FormSubmission.create({
       address: req.body.address,
-      position: req.body.position,
     }).then((submission) => {
       res.status(201).json(submission);
     }).catch((error) => {
