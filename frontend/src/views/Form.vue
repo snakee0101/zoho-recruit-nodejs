@@ -252,10 +252,13 @@ function submitForm() {
     return
   }
 
+  console.log(form.availabilityInterview)
+
   axios.post('http://localhost:3001/api/form_submissions', {
     ...form,
     token: localStorage.getItem('token'),
-    dob: UTCToLocalTime(form.dob)
+    dob: UTCToLocalTime(form.dob),
+    availabilityInterview: UTCToLocalTime(form.availabilityInterview),
   })
       .then(response => {
           showSuccess.value = true
