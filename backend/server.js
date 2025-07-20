@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
 const { DateTime } = require('luxon');
+require('dotenv').config();
 
 const jwt = require('jsonwebtoken');
  
@@ -82,18 +83,14 @@ app.post('/api/token', async (req, res) => {
 });
 
 app.get('/oauth', (req, res) => {
-  const clientId = "1000.TV6HFTR586F2SJ2F8K25JRDT2K6C1B"
-  const redirectUrl = "http://localhost:3001/oauth"
-  const clientSecret = '177a022941b2ebbab718710bdc1bb5989fb402a5cf';
-
   const { code, 'accounts-server': accountsServer } = req.query;
 
   axios.post(`${accountsServer}/oauth/v2/token`, null, {
       params: {
         code: code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUrl,
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        redirect_uri: process.env.REDIRECT_URL,
         grant_type: 'authorization_code',
       },
       headers: {
@@ -224,19 +221,13 @@ async function refresh_tokens(user) {
   //2. Refresh access token if it is expired
   if(is_access_token_expired(access_token)) {
     //2.1. refresh tokens
-    const accountsServer = 'https://accounts.zoho.eu';
-    const refreshToken = tokens.refresh_token;
-    const clientId = '1000.TV6HFTR586F2SJ2F8K25JRDT2K6C1B';
-    const clientSecret = '177a022941b2ebbab718710bdc1bb5989fb402a5cf';
-    const redirectUrl = 'http://localhost:3001/oauth';
-
-    const url = `${accountsServer}/oauth/v2/token`;
+    const url = `${process.env.ACCOUNTS_SERVER}/oauth/v2/token`;
 
     const params = new URLSearchParams({
-      refresh_token: refreshToken,
-      client_id: clientId,
-      client_secret: clientSecret,
-      redirect_uri: redirectUrl,
+      refresh_token: tokens.refresh_token,
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
+      redirect_uri: process.env.REDIRECT_URL,
       grant_type: 'refresh_token'
     });
 
@@ -334,16 +325,6 @@ app.post('/api/form_submissions', async (req, res) => {
   });
 
   //TODO: also there are files field "resume" that must be saved to Zoho Recruit
-
-  /*axios.get('https://recruit.zoho.eu/recruit/v2/Candidates', {
-    headers: {
-      'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
-    }
-  }).then((response) => {
-    res.status(200).json(response.data);
-  }).catch((error) => {
-    res.status(500).json(error);
-  });*/
   
   //4. save form submission to database
   try {
