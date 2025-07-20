@@ -235,13 +235,28 @@ function resetForm() {
   step.value = 1
 }
 
+//because date in date fields is converted to UTC automatically, but we want local time
+function UTCToLocalTime(utcString) {
+  const utcDate = new Date(utcString);
+
+  // Add the local timezone offset
+  const localDate = new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * -60_000));
+
+  // Format as ISO string without the 'Z'
+  return localDate.toISOString().replace('Z', '');
+}
+
 function submitForm() {
   if (!validateStep2()) {
     alert('Please fill in all required fields in stage 2 before submitting the form.')
     return
   }
 
-  axios.post('http://localhost:3001/api/form_submissions', {...form, token: localStorage.getItem('token')})
+  axios.post('http://localhost:3001/api/form_submissions', {
+    ...form,
+    token: localStorage.getItem('token'),
+    dob: UTCToLocalTime(form.dob)
+  })
       .then(response => {
           showSuccess.value = true
           resetForm()

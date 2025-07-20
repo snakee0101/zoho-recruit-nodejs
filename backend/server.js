@@ -254,14 +254,8 @@ async function refresh_tokens(user) {
   return tokens;
 }
 
-function formatDateToYMD(isoString) {
-  const date = new Date(isoString);
-
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
-  const day = String(date.getUTCDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
+function timestampToDate(isoString) {
+  return isoString.split('T')[0];
 }
 
 function trimMilliseconds(timestampString) {
@@ -303,10 +297,10 @@ app.post('/api/form_submissions', async (req, res) => {
         }],
         'Previous_Employer': req.body.previousEmployer,
         'Notice_Period': req.body.noticePeriod,
-        'Date_Of_Birth': formatDateToYMD(req.body.dob),
+        'Date_Of_Birth': timestampToDate(req.body.dob),
         'Preferred_Location': req.body.preferredLocation,
         'Cover_Letter_Text': req.body.coverLetter,
-        'Availability_For_Interview': trimMilliseconds(req.body.availabilityInterview),
+        'Availability_For_Interview': req.body.availabilityInterview ? trimMilliseconds(req.body.availabilityInterview) : null,
         'Position_Applied_For': req.body.position,
         'Current_Address': req.body.address
       }]
