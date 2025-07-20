@@ -10,11 +10,13 @@ import FileUpload from 'primevue/fileupload'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import MultiSelect from 'primevue/multiselect'
+import config from '../config'
 
 onMounted(() => {
-  const accountsServer = "https://accounts.zoho.eu"
-  const clientId = "1000.TV6HFTR586F2SJ2F8K25JRDT2K6C1B"
-  const redirectUrl = "http://localhost:3001/oauth"
+
+  const accountsServer = config.ACCOUNTS_SERVER
+  const clientId = config.CLIENT_ID
+  const redirectUrl = config.REDIRECT_URL
   const scopes = 'ZohoRECRUIT.modules.all'
 
   //check whether you need to authorize
