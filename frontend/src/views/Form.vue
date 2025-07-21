@@ -211,7 +211,7 @@ function goToStep2() {
   step.value = 2;
 }
 
-function selectFiles(event) {
+function selectFile(event) {
   form.resume = event.files[0]
 }
 
@@ -252,15 +252,21 @@ function submitForm() {
     return
   }
 
-  console.log(form.availabilityInterview)
+  let formData = new FormData();
 
-  axios.post('http://localhost:3001/api/form_submissions', {
-    ...form,
-    token: localStorage.getItem('token'),
-    dob: UTCToLocalTime(form.dob),
-    availabilityInterview: UTCToLocalTime(form.availabilityInterview),
-  })
-      .then(response => {
+  Object.entries(form).forEach(([key, value]) => {
+    formData.append(key, value);
+  });
+
+  formData.set('token', localStorage.getItem('token'));
+  formData.set('dob', UTCToLocalTime(form.dob));
+  formData.set('availabilityInterview', UTCToLocalTime(form.availabilityInterview));
+
+  axios.post('http://localhost:3001/api/form_submissions', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }).then(response => {
           showSuccess.value = true
           resetForm()
 
@@ -323,8 +329,9 @@ function submitForm() {
                 id="resume"
                 name="resume"
                 mode="basic"
+                customUpload
                 accept=".pdf,.doc,.docx"
-                @select="selectFiles"
+                @select="selectFile($event)"
                 required
               />
               <p class="error-text" v-if="errors.resume">{{ errors.resume }}</p>
