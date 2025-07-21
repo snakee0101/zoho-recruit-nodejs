@@ -262,7 +262,10 @@ function trimMilliseconds(timestampString) {
   return timestampString.split('.')[0];
 }
 
-app.post('/api/form_submissions', async (req, res) => {
+const multer = require('multer');
+const upload = multer();
+
+app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
   //1. get user by token 
   const user = await User.findOne({
     where: {
@@ -277,6 +280,13 @@ app.post('/api/form_submissions', async (req, res) => {
   //2. get new tokens
   const userTokens = await refresh_tokens(user); //{"access_token": "...", "refresh_token": "..."}
 
+  //warning! replace "null" values (multer transforms nulls into strings) with true null
+  for (const [key, value] of Object.entries(req.body)) {
+    if (value === 'null') {
+      req.body[key] = null;
+    }
+  }
+
   //3. send API request
   axios.post(
     'https://recruit.zoho.eu/recruit/v2/Candidates',
@@ -289,7 +299,7 @@ app.post('/api/form_submissions', async (req, res) => {
         'Expected_Salary': req.body.expectedSalary,
         'Experience_in_Years': req.body.yearsExperience,
         'LinkedIn__s': req.body.linkedin,
-        'Skill_Set': req.body.skills.join(', '),
+        'Skill_Set': req.body.skills, //array was already converted into string by multer
         'Source': req.body.sourceApplication,
         'Current_Job_Title': req.body.currentJobTitle,
         'Educational_Details': [{
