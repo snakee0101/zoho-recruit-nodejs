@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const axios = require('axios');
 const { DateTime } = require('luxon');
 require('dotenv').config();
+const FormData = require('form-data');
 
 const jwt = require('jsonwebtoken');
  
@@ -287,50 +288,7 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
     }
   }
 
-  //3. send API request
-  axios.post(
-    'https://recruit.zoho.eu/recruit/v2/Candidates',
-    {
-      data: [{
-        'First_Name': req.body.firstName,
-        'Last_Name': req.body.lastName,
-        'Email': req.body.email,
-        'Phone': req.body.phone,
-        'Expected_Salary': req.body.expectedSalary,
-        'Experience_in_Years': req.body.yearsExperience,
-        'LinkedIn__s': req.body.linkedin,
-        'Skill_Set': req.body.skills, //array was already converted into string by multer
-        'Source': req.body.sourceApplication,
-        'Current_Job_Title': req.body.currentJobTitle,
-        'Educational_Details': [{
-          'Degree': req.body.educationLevel,
-        }],
-        'Previous_Employer': req.body.previousEmployer,
-        'Notice_Period': req.body.noticePeriod,
-        'Date_Of_Birth': timestampToDate(req.body.dob),
-        'Preferred_Location': req.body.preferredLocation,
-        'Cover_Letter_Text': req.body.coverLetter,
-        'Availability_For_Interview': req.body.availabilityInterview ? trimMilliseconds(req.body.availabilityInterview) : null,
-        'Position_Applied_For': req.body.position,
-        'Current_Address': req.body.address
-      }]
-    },
-    {
-      headers: {
-        'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
-      }
-    }
-  )
-  .then((response) => {
-    res.status(200).json(response.data);
-  })
-  .catch((error) => {
-    res.status(500).json(error.response?.data || { error: 'Request failed' });
-  });
-
-  //TODO: also there are files field "resume" that must be saved to Zoho Recruit
-  
-  //4. save form submission to database
+  //3. save form submission to database
   try {
     FormSubmission.create({
       first_name: req.body.firstName,
@@ -353,6 +311,8 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
       cover_letter: req.body.coverLetter,
       source_application: req.body.sourceApplication,
     }).then((submission) => {
+      
+      
       res.status(201).json(submission);
     }).catch((error) => {
       console.log(error);
@@ -361,6 +321,64 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
     console.error('Failed to save form submission:', error);
     res.status(500).json({ error: 'Failed to save submission' });
   }
+
+  //3. send API request
+    axios.post('https://recruit.zoho.eu/recruit/v2/Candidates', {
+        data: [{
+          'First_Name': req.body.firstName,
+          'Last_Name': req.body.lastName,
+          'Email': req.body.email,
+          'Phone': req.body.phone,
+          'Expected_Salary': req.body.expectedSalary,
+          'Experience_in_Years': req.body.yearsExperience,
+          'LinkedIn__s': req.body.linkedin,
+          'Skill_Set': req.body.skills, //array was already converted into string by multer
+          'Source': req.body.sourceApplication,
+          'Current_Job_Title': req.body.currentJobTitle,
+          'Educational_Details': [{
+            'Degree': req.body.educationLevel,
+          }],
+          'Previous_Employer': req.body.previousEmployer,
+          'Notice_Period': req.body.noticePeriod,
+          'Date_Of_Birth': timestampToDate(req.body.dob),
+          'Preferred_Location': req.body.preferredLocation,
+          'Cover_Letter_Text': req.body.coverLetter,
+          'Availability_For_Interview': req.body.availabilityInterview ? trimMilliseconds(req.body.availabilityInterview) : null,
+          'Position_Applied_For': req.body.position,
+          'Current_Address': req.body.address
+        }]
+      },
+      {
+        headers: {
+          'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
+        }
+      }
+    ).then(candidateResponse => {
+        //upload resume file as an attachment to candidate module
+        let candidateId = candidateResponse.data.data[0].details.id;
+        
+        const formData = new FormData();
+        
+        formData.append('attachments_category', 'Resume');
+        formData.append('file', req.file.buffer, {
+          filename: req.file.originalname,
+          contentType: req.file.mimetype
+        });
+      
+        axios.post(`https://recruit.zoho.eu/recruit/v2/Candidates/${candidateId}/Attachments`, formData, {
+          headers: {
+            ...formData.getHeaders(),
+            'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
+          }
+        }).then((attachmentResponse) => {
+          res.status(200).send(attachmentResponse.data);
+        }).catch((err) => {
+          res.status(500).json(err)
+        });
+      
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
 });
 
 app.listen(port, () => {
