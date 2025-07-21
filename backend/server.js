@@ -290,39 +290,29 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
 
   //3. save form submission to database
   try {
-    FormSubmission.create({
+    let submission_result = await FormSubmission.create({
       first_name: req.body.firstName,
       last_name: req.body.lastName,
       email: req.body.email,
       phone: req.body.phone,
       address: req.body.address,
-      dob: req.body.dob,
+      dob: req.body.dob ? req.body.dob.substr(0, 10) : null, // "2025-07-01"
       position: req.body.position,
       linkedin: req.body.linkedin,
       education_level: req.body.educationLevel,
-      years_experience: req.body.yearsExperience,
-      skills: req.body.skills,
+      years_experience: req.body.yearsExperience ? parseInt(req.body.yearsExperience, 10) : null,
+      skills: req.body.skills ? req.body.skills.split(',').map(s => s.trim()) : [], // array for TEXT[]
       previous_employer: req.body.previousEmployer,
       current_job_title: req.body.currentJobTitle,
       notice_period: req.body.noticePeriod,
-      expected_salary: req.body.expectedSalary,
-      availability_interview: req.body.availabilityInterview,
+      expected_salary: req.body.expectedSalary ? parseInt(req.body.expectedSalary, 10) : null,
+      availability_interview: req.body.availabilityInterview ? new Date(req.body.availabilityInterview) : null,
       preferred_location: req.body.preferredLocation,
       cover_letter: req.body.coverLetter,
-      source_application: req.body.sourceApplication,
-    }).then((submission) => {
-      
-      
-      res.status(201).json(submission);
-    }).catch((error) => {
-      console.log(error);
+      source_application: req.body.sourceApplication
     });
-  } catch (error) {
-    console.error('Failed to save form submission:', error);
-    res.status(500).json({ error: 'Failed to save submission' });
-  }
-
-  //3. send API request
+    
+    // 4 send API request
     axios.post('https://recruit.zoho.eu/recruit/v2/Candidates', {
         data: [{
           'First_Name': req.body.firstName,
@@ -371,14 +361,17 @@ app.post('/api/form_submissions', upload.single('resume'), async (req, res) => {
             'Authorization': `Zoho-oauthtoken ${userTokens.access_token}`
           }
         }).then((attachmentResponse) => {
-          res.status(200).send(attachmentResponse.data);
+          res.status(200).send(res.status(201).json(submission_result));
         }).catch((err) => {
           res.status(500).json(err)
         });
-      
     }).catch((error) => {
         res.status(500).json(error);
     });
+  } catch (error) {
+    console.error('Failed to save form submission:', error);
+    res.status(500).json({ error: 'Failed to save submission' });
+  }
 });
 
 app.listen(port, () => {
